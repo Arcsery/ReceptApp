@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "624627876452",
+    "project_id": "recept-2e5db",
+    "storage_bucket": "recept-2e5db.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:624627876452:android:526fea948fbbe59425d571",
+        "android_client_info": {
+          "package_name": "com.example.recept"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "624627876452-5569uvd24c5m90gdf6gpaidma3ohk67t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCc2jT-EzDsYrZHF_KRMw28bPELdTB7WOY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "624627876452-5569uvd24c5m90gdf6gpaidma3ohk67t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

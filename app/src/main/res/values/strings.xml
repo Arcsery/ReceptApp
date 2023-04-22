@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">ReceptApp</string>
+    <string name="sign_in">Sign in</string>
+    <string name="email">email</string>
+    <string name="password">password</string>
+    <string name="login">LOGIN</string>
+    <string name="password_again">password again</string>
+    <string name="name">name</string>
+    <string name="register">Register</string>
+    <string name="sign_up">Sign up</string>
+</resources>
