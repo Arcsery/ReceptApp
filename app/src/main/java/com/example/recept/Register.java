@@ -11,10 +11,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Register extends AppCompatActivity {
     private static final String LOG_TAG = Register.class.getName();
@@ -28,6 +31,8 @@ public class Register extends AppCompatActivity {
     MaterialButton registerbtn;
 
     private FirebaseAuth mAuth;
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +66,20 @@ public class Register extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()){
-                                Log.d(LOG_TAG, "Sikeres regisztráció");
+                                String id = task.getResult().getUser().getUid();
+                                User user = new User(id, name, email);
+                                db.collection("users").document(id).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Log.d(LOG_TAG, "Sikeres regisztráció\n");
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.d(LOG_TAG, "Valami nem jó belül");
+                                    }
+                                });
+
                             }else{
                                 Log.d(LOG_TAG, "Valami nem jó");
                                 Toast.makeText(Register.this, "Valami nem jó" + task.getException().getMessage() ,Toast.LENGTH_SHORT).show();
