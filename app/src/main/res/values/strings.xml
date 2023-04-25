@@ -12,6 +12,24 @@
     <string name="small_description">Small description</string>
     <string name="details">Details</string>
     <string name="username">userName</string>
+    <string name="foodname">Foodname</string>
+    <string name="j_recept_hozz_ad_sa">Új recept hozzáadása</string>
+    <string name="tel_neve">Étel neve</string>
+    <string name="hozz_valok_megad_sa">Hozzávalok megadása</string>
+
+
+    <string-array name="shopping_item_id">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </string-array>
 
 
     <string-array name="shopping_item_names">

@@ -1,14 +1,26 @@
 package com.example.recept;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.SearchView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
@@ -16,7 +28,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private FirebaseUser user;
     private FirebaseAuth mAuth;
-
+    private FirebaseFirestore mFirestore;
+    private CollectionReference mItems;
     private RecyclerView mRecyclerView;
     private ArrayList<RecipeItem> mItemList;
     private RecipeAdapter mAdapter;
@@ -39,25 +52,89 @@ public class HomeActivity extends AppCompatActivity {
 
         mRecyclerView.setAdapter(mAdapter);
 
-        initializeData();
+
+        mFirestore = FirebaseFirestore.getInstance();
+        mItems = mFirestore.collection("recipes");
 
     }
 
-    private void initializeData() {
-        String[] itemsList = getResources().getStringArray(R.array.shopping_item_names);
-        String[] itemsDescription = getResources().getStringArray(R.array.shopping_item_desc);
-        String[] itemsFoodname = getResources().getStringArray(R.array.shopping_item_price);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        queryData();
+    }
 
-        TypedArray itemsImageresource = getResources().obtainTypedArray(R.array.shopping_item_images);
-        TypedArray itemsRate = getResources().obtainTypedArray(R.array.shopping_item_rates);
-
+    private void queryData() {
         mItemList.clear();
-        for (int i = 0; i < itemsList.length; i++){
-            mItemList.add(new RecipeItem(itemsList[i], itemsDescription[i], itemsFoodname[i], itemsRate.getFloat(i, 0), itemsImageresource.getResourceId(i, 0)));
+
+        // új szál indítása
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mItems.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        // eredménykezelés a főszálban
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                    RecipeItem item = documentSnapshot.toObject(RecipeItem.class);
+                                    mItemList.add(item);
+                                    Log.d("Activity", item.getFoodName());
+                                }
+                                mAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                });
+            }
+        }).start();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.recipe_list_menu, menu);
+        MenuItem menuItem = menu.findItem(R.id.search_bar);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                Log.d("Activity", s);
+                mAdapter.getFilter().filter(s);
+                return false;
+            }
+        });
+
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.logout:
+                FirebaseAuth.getInstance().signOut();
+                finish();
+                return true;
+            case R.id.profile:
+                return true;
+            case R.id.add_recipe:
+                Intent intent = new Intent(this, AddRecipeActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        itemsImageresource.recycle();
-
-        mAdapter.notifyDataSetChanged();
     }
 }

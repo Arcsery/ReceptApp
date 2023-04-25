@@ -18,7 +18,7 @@
             android:id="@+id/itemTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/username"
+            android:text="@string/foodname"
             android:layout_below="@id/itemImage"
             android:padding="8dp"
             android:textColor="?android:textColorSecondary" />
@@ -41,21 +41,11 @@
             android:layout_below="@id/ratingBar"
             android:padding="8dp" />
 
-        <TextView
-            android:id="@+id/foodName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="foo"
-            android:layout_below="@id/subTitle"
-            android:layout_marginBottom="12dp"
-            android:padding="8dp"
-            android:layout_centerHorizontal="true"/>
-
         <Button
             android:id="@+id/detailsbtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/foodName"
+            android:layout_below="@id/subTitle"
             android:text="@string/details"
             android:layout_centerHorizontal="true"/>
 

@@ -55,25 +55,44 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void login(){
+    public void login() {
         Intent intent = new Intent(this, HomeActivity.class);
         loginbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String email = emailEt.getText().toString();
                 String password = passwordEt.getText().toString();
-                mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+
+                // Külön szál indítása
+                new Thread(new Runnable() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
-                            Log.d(LOG_TAG, "Sikeres bejelentkezés");
-                            startActivity(intent);
-                        }else{
-                            Log.d(LOG_TAG, "Valami nem jó");
-                            Toast.makeText(MainActivity.this, "Valami nem jó" + task.getException().getMessage() ,Toast.LENGTH_SHORT).show();
-                        }
+                    public void run() {
+                        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    Log.d(LOG_TAG, "Sikeres bejelentkezés");
+                                    // Az Activity indítása a fő szálon
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            startActivity(intent);
+                                        }
+                                    });
+                                } else {
+                                    Log.d(LOG_TAG, "Valami nem jó");
+                                    // Toast megjelenítése a fő szálon
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(MainActivity.this, "Valami nem jó" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            }
+                        });
                     }
-                });
+                }).start();
             };
         });
     }

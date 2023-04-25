@@ -5,6 +5,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
@@ -42,6 +44,15 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
         RecipeItem currentItem = mRecipeItemsData.get(position);
 
         holder.bindTo(currentItem);
+        holder.setId(currentItem.getId());
+        holder.setUserId(currentItem.getUserId());
+        holder.setDescription(currentItem.getDescription());
+
+        if(holder.getAbsoluteAdapterPosition() > lastPosition){
+            Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_row);
+            holder.itemView.startAnimation(animation);
+            lastPosition = holder.getAbsoluteAdapterPosition();
+        }
     }
 
     @Override
@@ -87,33 +98,43 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
 
     class ViewHolder extends RecyclerView.ViewHolder{
 
-        private TextView mName;
-        private TextView mDescription;
-        private TextView mFoodName;
+        private String mId;
+        private String mUserId;
+        private String mDescription;
+
+        private TextView mfoodName;
+        private TextView mSmallDescription;
+
         private ImageView mitemImage;
         private RatingBar mRatingbar;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            mName = itemView.findViewById(R.id.itemTitle);
-            mDescription = itemView.findViewById(R.id.subTitle);
-            mFoodName = itemView.findViewById(R.id.foodName);
+            mfoodName = itemView.findViewById(R.id.itemTitle);
+            mSmallDescription = itemView.findViewById(R.id.subTitle);
             mitemImage  = itemView.findViewById(R.id.itemImage);
             mRatingbar = itemView.findViewById(R.id.ratingBar);
 
             itemView.findViewById(R.id.detailsbtn).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.d("Activity", "Details button clicked!");
+                    Log.d("Activity", mId);
+                    Log.d("Activity", mUserId);
+                    Log.d("Activity", mDescription);
                 }
             });
         }
 
+        public void setId(String id) {
+            mId = id;
+        }
+        public void setUserId(String userId){mUserId = userId;}
+        public void setDescription(String description){mDescription = description;}
+
         public void bindTo(RecipeItem currentItem) {
-            mName.setText(currentItem.getName());
-            mDescription.setText(currentItem.getDescription());
-            mFoodName.setText(currentItem.getFoodName());
+            mfoodName.setText(currentItem.getFoodName());
+            mSmallDescription.setText(currentItem.getSmallDescription());
             mRatingbar.setRating(currentItem.getRatedInfo());
 
             Glide.with(mContext).load(currentItem.getImageResource()).into(mitemImage);

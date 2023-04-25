@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/search_bar"
+        android:title="Search"
+        android:icon="@drawable/baseline_search_24"
+        app:showAsAction="always"
+        app:actionViewClass="android.widget.SearchView"
+        />
+    <item
+        android:id="@+id/profile"
+        android:title="Profil"
+        android:icon="@drawable/baseline_person_24"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/add_recipe"
+        android:title="Új recept"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/logout"
+        android:title="Kijelentkezés"
+        app:showAsAction="never"
+        />
+</menu>

@@ -72,6 +72,8 @@ public class Register extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Void unused) {
                                         Log.d(LOG_TAG, "Sikeres regisztráció\n");
+                                        Intent intent = new Intent(Register.this, HomeActivity.class);
+                                        startActivity(intent);
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
