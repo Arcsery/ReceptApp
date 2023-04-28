@@ -1,5 +1,6 @@
 package com.example.recept;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,31 +18,37 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder> implements Filterable {
+public class OwnRecipeAdapter extends RecyclerView.Adapter<OwnRecipeAdapter.ViewHolder> implements Filterable {
     private ArrayList<RecipeItem> mRecipeItemsData;
     private ArrayList<RecipeItem> mRecipeItemsDataAll;
     private Context mContext;
+
+    private FirebaseFirestore db;
     private int lastPosition = -1;
 
-    RecipeAdapter(Context context, ArrayList<RecipeItem> itemsData){
+    OwnRecipeAdapter(Context context, ArrayList<RecipeItem> itemsData){
         this.mRecipeItemsData = itemsData;
         this.mRecipeItemsDataAll = itemsData;
         this.mContext = context;
+        db = FirebaseFirestore.getInstance();
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Log.d("ActivityVIEW", String.valueOf(viewType));
-        return new ViewHolder(LayoutInflater.from(mContext).inflate(R.layout.list_item, parent, false));
+        return new ViewHolder(LayoutInflater.from(mContext).inflate(R.layout.ownlist_item, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(RecipeAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(OwnRecipeAdapter.ViewHolder holder, int position) {
         RecipeItem currentItem = mRecipeItemsData.get(position);
 
         holder.bindTo(currentItem);
@@ -117,14 +124,39 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
             mitemImage  = itemView.findViewById(R.id.itemImage);
             mRatingbar = itemView.findViewById(R.id.ratingBar);
 
-            itemView.findViewById(R.id.detailsbtn).setOnClickListener(new View.OnClickListener() {
+            itemView.findViewById(R.id.delete_btn).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Log.d("Activity", mId);
                     Log.d("Activity", mUserId);
                     Log.d("Activity", mDescription);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            db.collection("recipes").document(mId).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Log.d("deletsucces", "DocumentSnapshot successfully deleted!");
+                                    int position = getAdapterPosition();
+                                    mRecipeItemsData.remove(position);
+                                    ((Activity)mContext).runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            notifyItemRemoved(position);
+                                        }
+                                    });
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w("deletefail", "Error deleting document", e);
+                                }
+                            });
+                        }
+                    }).start();
                 }
             });
+
         }
 
         public void setId(String id) {

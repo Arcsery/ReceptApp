@@ -1,6 +1,7 @@
 package com.example.recept;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,7 +23,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
-public class HomeActivity extends AppCompatActivity {
+public class OwnRecipesActivity extends AppCompatActivity {
 
     private FirebaseUser user;
     private FirebaseAuth mAuth;
@@ -30,14 +31,14 @@ public class HomeActivity extends AppCompatActivity {
     private CollectionReference mItems;
     private RecyclerView mRecyclerView;
     private ArrayList<RecipeItem> mItemList;
-    private RecipeAdapter mAdapter;
+    private OwnRecipeAdapter mAdapter;
 
     private int gridNumber = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_own_recipes);
 
         mAuth = FirebaseAuth.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();;
@@ -46,15 +47,15 @@ public class HomeActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, gridNumber));
         mItemList = new ArrayList<>();
 
-        mAdapter = new RecipeAdapter(this, mItemList);
+        mAdapter = new OwnRecipeAdapter(this, mItemList);
 
         mRecyclerView.setAdapter(mAdapter);
 
 
         mFirestore = FirebaseFirestore.getInstance();
         mItems = mFirestore.collection("recipes");
-
     }
+
 
     @Override
     protected void onResume() {
@@ -65,22 +66,22 @@ public class HomeActivity extends AppCompatActivity {
     private void queryData() {
         mItemList.clear();
 
+        // új szál indítása
         new Thread(new Runnable() {
             @Override
             public void run() {
-                mItems.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                mItems.whereEqualTo("userId", user.getUid()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        ArrayList<RecipeItem> itemList = new ArrayList<>();
-                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            RecipeItem item = documentSnapshot.toObject(RecipeItem.class);
-                            itemList.add(item);
-                            Log.d("Activity", item.getFoodName());
-                        }
+                        // eredménykezelés a főszálban
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                mItemList.addAll(itemList);
+                                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                    RecipeItem item = documentSnapshot.toObject(RecipeItem.class);
+                                    mItemList.add(item);
+                                    Log.d("Activity", item.getFoodName());
+                                }
                                 mAdapter.notifyDataSetChanged();
                             }
                         });
@@ -89,6 +90,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         }).start();
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -125,8 +127,6 @@ public class HomeActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.profile:
-                Intent OwnRecipeintent = new Intent(this, OwnRecipesActivity.class);
-                startActivity(OwnRecipeintent);
                 return true;
             case R.id.add_recipe:
                 Intent intent = new Intent(this, AddRecipeActivity.class);
