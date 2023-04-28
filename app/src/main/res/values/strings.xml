@@ -16,6 +16,7 @@
     <string name="j_recept_hozz_ad_sa">Új recept hozzáadása</string>
     <string name="tel_neve">Étel neve</string>
     <string name="hozz_valok_megad_sa">Hozzávalok megadása</string>
+    <string name="food_name_text">Készítette: %1$s</string>
 
 
     <string-array name="shopping_item_id">

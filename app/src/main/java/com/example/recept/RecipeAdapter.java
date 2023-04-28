@@ -1,6 +1,7 @@
 package com.example.recept;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +49,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
         holder.setId(currentItem.getId());
         holder.setUserId(currentItem.getUserId());
         holder.setDescription(currentItem.getDescription());
+        holder.setName(currentItem.getName());
+        holder.setFoodname(currentItem.getFoodName());
 
         if(holder.getAbsoluteAdapterPosition() > lastPosition){
             Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_row);
@@ -102,6 +105,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
         private String mId;
         private String mUserId;
         private String mDescription;
+        private String mName;
+        private String intentFoodName;
 
         private TextView mfoodName;
         private TextView mSmallDescription;
@@ -123,6 +128,12 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
                     Log.d("Activity", mId);
                     Log.d("Activity", mUserId);
                     Log.d("Activity", mDescription);
+                    Intent intent = new Intent(view.getContext(), RecipeDetealActivity.class);
+                    intent.putExtra("Description", mDescription);
+                    intent.putExtra("Name", mName);
+                    intent.putExtra("FoodName", intentFoodName);
+                    view.getContext().startActivity(intent);
+
                 }
             });
         }
@@ -131,7 +142,9 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
             mId = id;
         }
         public void setUserId(String userId){mUserId = userId;}
+        public void setName(String name){mName = name;}
         public void setDescription(String description){mDescription = description;}
+        public void setFoodname(String foodName){intentFoodName = foodName;}
 
         public void bindTo(RecipeItem currentItem) {
             mfoodName.setText(currentItem.getFoodName());

@@ -12,6 +12,9 @@
         android:theme="@style/Theme.Recept"
         tools:targetApi="31">
         <activity
+            android:name=".RecipeDetealActivity"
+            android:exported="false" />
+        <activity
             android:name=".OwnRecipesActivity"
             android:exported="false" />
         <activity
