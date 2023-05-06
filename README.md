@@ -2,6 +2,7 @@
 Kötprog mobilalkra
 
 Recept megosztó app
+Pixel 3a API 30-on lett fejleszve, de ha minden igaz az appnak a méreteket tartani kéne. 
 
 Ha valami probléma vagy kérdés van akkor keress dc-n: Archer#2718
 
