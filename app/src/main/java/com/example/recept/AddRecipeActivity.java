@@ -2,8 +2,13 @@ package com.example.recept;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +30,7 @@ public class AddRecipeActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private CollectionReference items;
+    private NotificationManager notificationManager;
     String userId;
     String userName;
 
@@ -48,6 +54,7 @@ public class AddRecipeActivity extends AppCompatActivity {
         userId = mAuth.getUid();
         items = db.collection("users");
         recipeId = UUID.randomUUID().toString();
+        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         getUsername();
         addRecipe();
     }
@@ -72,6 +79,7 @@ public class AddRecipeActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(Void unused) {
                                     Log.d("Activity", "Skierült hozzáadni");
+                                    createNotification();
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -109,6 +117,28 @@ public class AddRecipeActivity extends AppCompatActivity {
             }
         });
         thread.start();
+    }
+
+    private void createNotification() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("default",
+                    "Értesítési csatorna",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+
+
+        // Az értesítés létrehozása
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "default")
+                .setContentTitle("Recept hozzáadva")
+                .setContentText("Sikeresen hozzáadtál egy receptet")
+                .setSmallIcon(android.R.drawable.ic_dialog_info) // Itt adjuk meg az ikont
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        // Az értesítés megjelenítése
+        notificationManager.notify(0, builder.build());
     }
 
 }
